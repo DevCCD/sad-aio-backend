@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Ugt {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  ugt       String     @unique
+  distritos Distrito[]
+}
+
+model Distrito {
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  nombre           String             @unique
+  ugtrel           Ugt                @relation(fields: [ugtId], references: [id])
+  ugtId            String             @db.ObjectId
+  coords           String
+  images           String[]
+  idh              Idh[]
+  brechas          Brecha[]
+  recursos         Recurso[]
+  proyectos        Proyecto[]
+  potencialidades  Potencialidad[]
+  brechaFinanciera BrechaFinanciera[]
+  InversionSocial  InversionSocial[]
+}
+
+model Periodo {
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  titulo           String             @unique
+  value            String             @unique
+  idh              Idh[]
+  brechas          Brecha[]
+  brechaFinanciera BrechaFinanciera[]
+}
+
+model Proyecto {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  distrito          Distrito @relation(fields: [distritoNombre], references: [nombre])
+  distritoNombre    String
+  name_proyecto     String
+  time_frame        String
+  entidad           String
+  tipo_inversion    String
+  monto_actualizado Float
+  coords            String
+  periodos          String[]
+  factores          String
+  conclusion        String
+}
+
+model Idh {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  distrito           Distrito @relation(fields: [distritoNombre], references: [nombre])
+  distritoNombre     String
+  idh                Float
+  ingreso_per_capita Float
+  periodo            Periodo  @relation(fields: [periodoValue], references: [value])
+  periodoValue       String
+}
+
+model Brecha {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  variable       String
+  distrito       Distrito @relation(fields: [distritoNombre], references: [nombre])
+  distritoNombre String
+  impacto        Boolean
+  periodo        Periodo  @relation(fields: [periodoValue], references: [value])
+  periodoValue   String
+  porcentaje     Float
+}
+
+model BrechaFinanciera {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  distrito       Distrito @relation(fields: [distritoNombre], references: [nombre])
+  distritoNombre String
+  periodo        Periodo  @relation(fields: [periodoValue], references: [value])
+  periodoValue   String
+  monto          Float
+}
+
+model Recurso {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  distrito       Distrito @relation(fields: [distritoNombre], references: [nombre])
+  distritoNombre String
+  anio           String
+  valor          Float
+}
+
+model Potencial {
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  nombre          String          @unique
+  icono           String
+  hexColor        String
+  descripcion     String?
+  potencialidades Potencialidad[]
+}
+
+model Potencialidad {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  distrito        Distrito  @relation(fields: [distritoNombre], references: [nombre])
+  distritoNombre  String
+  potencial       Potencial @relation(fields: [potencialNombre], references: [nombre])
+  potencialNombre String
+}
+
+model InversionSocial {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  distrito       Distrito @relation(fields: [distritoNombre], references: [nombre])
+  distritoNombre String
+  anio           String
+  monto          Float
+}
+
+model Peru {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  nombre  String
+  idhPeru Float
+  periodo String @unique
+}
